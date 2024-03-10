@@ -51,16 +51,16 @@ public class VideoClub {
 	}
 	
 	public String filterByPrice(double price) {
-		
+		return "";
 	}
 	
 	public String filterAvailableMovies() {
-		
+		return "";
 	}
 	
 	public String activityLog(String rentalsFileName) throws
 	FileNotFoundException{
-		
+		return "";
 	}
 	
 	public void updateStock(String fileName) throws

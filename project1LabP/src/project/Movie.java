@@ -15,7 +15,7 @@ public class Movie {
 		this.quantity = quantity;
 		this.rentals = rentalsParse(rentals);
 		this.tax = tax;
-		this.code = codeMaker(title);
+		this.code = codeParse(title);
 	}
 	
 	public String getTitle() {
@@ -43,10 +43,23 @@ public class Movie {
 	}
 	
 	private int[][] rentalsParse(String rentals) {
-		
+		return new int[2][2];
 	}
 	
-	private String codeMaker(String title) {
+	private String codeParse(String title) {
+		StringBuilder code = new StringBuilder(title.toUpperCase());
+		int index = 0;
 		
+		while(index != -1) {
+			index = code.indexOf(" ");
+			if(index >= 0) {
+				code.deleteCharAt(index);
+			}
+		}
+		code.trimToSize();
+		
+		
+		
+		return code.toString();
 	}
 }
