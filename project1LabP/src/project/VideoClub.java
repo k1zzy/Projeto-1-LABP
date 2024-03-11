@@ -15,27 +15,33 @@ public class VideoClub {
 		filmes = new Movie[stock.length];
 		
 		for(int i = 0; i < stock.length; i++) {
-			filmes[i] = new Movie(stock[i][0], // title
+			filmes[i] = new Movie(
+									stock[i][0], // title
 									Integer.parseInt(stock[i][1]), // year
 									Integer.parseInt(stock[i][2]), // quantity
 									stock[i][3], // rentals
 									Double.parseDouble(stock[i][4]), // price
-									Double.parseDouble(stock[i][5]));// tax
+									Double.parseDouble(stock[i][5].replace("%", "")) // tax, delete a %
+								 );
 		}
 	}
 	
 	public int getNumberOfMovies() {
 		int filmesTotais = 0;
 		
-		for(Movie filme : filmes) {
+		for(Movie filme : filmes)
 			filmesTotais += filme.getQuantity();
-		}
-		
 		return filmesTotais;
 	}
 	
 	public int numberAvailableMovies() {
-		return filmes.length;
+		int filmesAvailable = 0;
+		
+		for(Movie filme : filmes) {
+			if(filme.getQuantity() >= 1)
+			filmesAvailable++;
+		}
+		return filmesAvailable;
 	}
 	
 	public double getTotalRevenue() {
@@ -70,9 +76,8 @@ public class VideoClub {
 	
 	private String[][] readStock(String fileName, int numberOfMovies)throws
 	FileNotFoundException {
-		Scanner ler = new Scanner(new File("fileName"));
+		Scanner ler = new Scanner(new File(fileName));
 		ler.nextLine(); //skippar cabealho
-		
 		int nLinhas = 0;
 		
 		while(ler.hasNext()) {
@@ -82,12 +87,12 @@ public class VideoClub {
 		
 		ler.close();
 		
-		Scanner ler2 = new Scanner(new File("fileName"));
-		ler.nextLine(); //skippar cabealho
+		Scanner ler2 = new Scanner(new File(fileName));
+		ler2.nextLine(); //skippar cabealho
 		
 		String[][] stock = new String[numberOfMovies <= nLinhas ? numberOfMovies : nLinhas][6]; // se o n de linhas for menor que numberOfMovies utiliza-se isso
 		
-		for(int i = 0; i <= nLinhas && i <= numberOfMovies; i++) { // acaba quando chegar ao maximo, seja ele o n de linhas ou o n de filmes pedidos
+		for(int i = 0; i < nLinhas && i < numberOfMovies; i++) { // acaba quando chegar ao maximo, seja ele o n de linhas ou o n de filmes pedidos
 			stock[i] = ler2.nextLine().split(",");
 		}
 		
