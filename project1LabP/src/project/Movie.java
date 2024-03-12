@@ -1,19 +1,21 @@
 package project;
 
+import java.util.Arrays;
+
 public class Movie {
 	private final String title;
 	private final int year;
 	private int quantity;
 	private int[][] rentals;
-	private double price;
-	private double tax;
+	private final double price;
+	private final double tax;
 	private final String code;
 	
-	public Movie(String title, int year, int quantity, String rentals, double price, double tax) {
+	public Movie(String title, int year, int quantity, int[][] rentals, double price, double tax) {
 		this.title = title;
 		this.year = year;
 		this.quantity = quantity;
-		this.rentals = rentalsParse(rentals);
+		this.rentals = rentals;
 		this.price = price;
 		this.tax = tax;
 		this.code = codeParse(title);
@@ -47,24 +49,28 @@ public class Movie {
 		return code;
 	}
 	
-	//TODO
-	private int[][] rentalsParse(String rentals) {
-		rentals.replace("()", ""); // remove os parenteses da string
-		int counter = 1; // numero de 
-		
-		for(int i = 0; i < rentals.length(); i++) {
-			counter++;
+	public void rentalRegister(int userId) {
+		rentals = Arrays.copyOf(rentals,rentals.length + 1);
+		rentals[rentals.length - 2][0] = userId;
+		rentals[rentals.length - 2][1] = 7;
+	}
+	
+	public void rentalUnregister(int userId) {		
+		for(int i = findUserIndex(userId); i < rentals.length - 1; i++) {
+			rentals[i][0] = rentals[i + 1][0];
+			rentals[i][1] = rentals[i + 1][1];
 		}
 		
-		String[] lines = new String[counter];
-		
-		int[][] rentalsAr = new int[counter][2];
-		
-//		for(int j = 0; j < counter; j++) {
-//			rentalsAr[j] = Integer.parseInt(lines[j].split(";"));
-//		}
-		
-		return rentalsAr;
+		rentals = Arrays.copyOf(rentals, rentals.length - 1);
+	}
+	
+	public int findUserIndex(int userId) {
+		for(int i = 0; i < rentals.length; i++) {
+			if(rentals[i][0] == userId) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	private String codeParse(String title) {

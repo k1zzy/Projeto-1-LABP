@@ -1,13 +1,12 @@
 package project;
 
 import java.io.FileNotFoundException;
-import java.util.Locale;
 import java.util.Scanner;
 import java.io.File;
 
 public class VideoClub {
-	private int totalProfit;
-	private int totalRevenue;
+	private double totalProfit;
+	private double totalRevenue;
 	private Movie[] filmes;
 	
 	public VideoClub(String fileName, int numberOfMovies)throws
@@ -20,9 +19,9 @@ public class VideoClub {
 									stock[i][0], // title
 									Integer.parseInt(stock[i][1]), // year
 									Integer.parseInt(stock[i][2]), // quantity
-									stock[i][3], // rentals
+									rentalsParse(stock[i][3]), // rentals
 									Double.parseDouble(stock[i][4]), // price
-									Double.parseDouble(stock[i][5].replace("%", "")) // tax, delete a %
+									Double.parseDouble(stock[i][5].replace("%", "")) // tax, deletes %
 								 );
 		}
 	}
@@ -58,7 +57,7 @@ public class VideoClub {
 		
 		for(Movie filme : filmes) {
 			if(filme.getYear() == year)
-				yearFilter.append(String.format("Title:" + filme.getTitle() + ",Price:$%.2f \n", filme.getPrice()));
+				yearFilter.append(String.format("Title:" + filme.getTitle() + ",Price:$%.2f" + System.lineSeparator(), filme.getPrice()));
 		}
 		
 		return yearFilter.toString();
@@ -69,7 +68,7 @@ public class VideoClub {
 		
 		for(Movie filme : filmes) {
 			if(filme.getPrice() <= price)
-				priceFilter.append(String.format("Title:" + filme.getTitle() + ",Price:$%.2f \n", filme.getPrice()));
+				priceFilter.append(String.format("Title:" + filme.getTitle() + ",Price:$%.2f" + System.lineSeparator(), filme.getPrice()));
 		}
 		
 		return priceFilter.toString();
@@ -80,7 +79,7 @@ public class VideoClub {
 		
 		for(Movie filme : filmes) {
 			if(filme.getQuantity() >= 1)
-				availableMovies.append(String.format("Title:" + filme.getTitle() + ",Price:$%.2f \n", filme.getPrice()));
+				availableMovies.append(String.format("Title:" + filme.getTitle() + ",Price:$%.2f" + System.lineSeparator(), filme.getPrice()));
 		}
 		
 		return availableMovies.toString();
@@ -90,29 +89,54 @@ public class VideoClub {
 	FileNotFoundException{
 		String[][] rentalsRead = readRentals(rentalsFileName);
 		StringBuilder sbRentals = new StringBuilder();
+		double afterTax = 0;
+		String userId = "";
+		String title = "";
 		
 		for(String[] action : rentalsRead) {
+			userId = action[1];
+			title = action[2];
+			
 			if(action[0] == "rent") {
-				switch(isMovieAvailable(action[0])) {
-				case -1:
-					sbRentals.append("Movie not found: client " + action[1] + " asked for " + action[2]);
-					break;
-				case 0:
-					Movie currentFilme = findMovie(action[2]);
-					sbRentals.append("Movie currently not available: client " + action[1] + " asked for " + currentFilme.getTitle());
-					break;
-				case 1:
-					Movie currentFilme2 = findMovie(action[2]);
-					sbRentals.append(String.format("Rental sucessful: client " + action[1] + " rented " + currentFilme2.getTitle() + "for $%.2f \n", currentFilme.getPrice()));
-					break;
+				if(!doesMovieExist(title)) {
+					sbRentals.append("Movie not found: client " + userId + " asked for " + title + System.lineSeparator());
+				}else {
+					Movie currentFilme = findMovie(title);
+					
+					if(!isMovieAvailable(currentFilme)) {
+						sbRentals.append("Movie currently not available: client " + userId + " asked for " + currentFilme.getTitle() + System.lineSeparator());
+					}else {
+						afterTax = currentFilme.getPrice() * (currentFilme.getTax() / 100);
+						sbRentals.append(String.format("Rental sucessful: client " + userId + " rented " + currentFilme.getTitle() + "for $%.2f" + System.lineSeparator() + 
+						"Total: $%.2f" + "[" + afterTax + "]" , currentFilme.getPrice()));
+						
+						currentFilme.rentalRegister(Integer.parseInt(userId)); // regista um novo rental
+						
+						totalRevenue += currentFilme.getPrice(); // adiciona ao total de revenue o preço do filme
+						totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
+					}
+				}
+			}else {
+				Movie currentFilme = findMovie(title);
+				
+				int numOfLateDays = Math.abs(currentFilme.getRentals()[currentFilme.findUserIndex(Integer.parseInt(userId))][1]);
+				
+				if(numOfLateDays > -1) { // verificar se o user esta OU nao com dias em atraso
+					sbRentals.append("Movie returned: client " + userId + " returned " + currentFilme.getTitle() + System.lineSeparator());
+					currentFilme.rentalUnregister(Integer.parseInt(userId));
+					
+				}else {
+					sbRentals.append("Movie returned with " + numOfLateDays + " days of delay: client " + userId + " returned " + currentFilme.getTitle() + System.lineSeparator());
+					currentFilme.rentalUnregister(Integer.parseInt(userId));
+					
+					totalProfit += numOfLateDays * 2.0;
 				}
 			}
-			else {
-				
-			}
+			
+			sbRentals.append("Revenue: " + totalRevenue + System.lineSeparator());
+			sbRentals.append("Profit: " + totalProfit + System.lineSeparator());
 		}
-		
-		return "blah";
+		return sbRentals.toString();
 	}
 	
 	public void updateStock(String fileName) throws
@@ -173,15 +197,36 @@ public class VideoClub {
 		return rentals;
 	}
 	
-	private int isMovieAvailable(String name) {
-		for(Movie filme : filmes) {
-			if(filme.getTitle() == name || filme.getCode() == name)
-				if(filme.getQuantity() >= 1)
-					return 1; // rental successful
-				else
-					return 0; // not in stock
+	private int[][] rentalsParse(String rentals) {
+		rentals.replace("[()]", ""); // remove os parenteses da string
+		
+		String[] lines = rentals.split(" ");
+		
+		String[][] rentalsArString = new String[lines.length][2];
+		int[][] rentalsAr = new int[lines.length][2];
+		
+		if(!(rentals != null)) {
+			for(int i = 0; i < rentalsAr.length; i++) {
+				rentalsArString[i] = lines[i].split(";");
+				for(int j = 0; j < 2; j++) {
+					rentalsAr[i][j] = Integer.parseInt(rentalsArString[i][j]);
+				}
+			}
 		}
-		return -1; // not found in database
+		return rentalsAr;
+	}
+	
+	private boolean doesMovieExist(String name) {
+		for(Movie filme : filmes) {
+			if(filme.getTitle() == name || filme.getCode() == name) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isMovieAvailable(Movie movie) {
+		return movie.getQuantity() >= 1;
 	}
 	
 	private Movie findMovie(String name) {
