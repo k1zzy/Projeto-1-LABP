@@ -1,4 +1,4 @@
-Title,ISBN,Author,Quantity,Price,Tax
+Title,Year,Quantity,Rentals,Price,Tax
 Angels & Demons,2009,2,,7.99,3.0%
 Barbie,2023,1,,10.99,6.5%
 Jurassic Park,1993,1,(25;-1),1.99,4.0%

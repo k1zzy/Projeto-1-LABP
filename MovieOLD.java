@@ -1,21 +1,19 @@
 package project;
 
-import java.util.Arrays;
-
 public class Movie {
 	private final String title;
 	private final int year;
 	private int quantity;
 	private int[][] rentals;
-	private final double price;
-	private final double tax;
+	private double price;
+	private double tax;
 	private final String code;
 	
-	public Movie(String title, int year, int quantity, int[][] rentals, double price, double tax) {
+	public Movie(String title, int year, int quantity, String rentals, double price, double tax) {
 		this.title = title;
 		this.year = year;
 		this.quantity = quantity;
-		this.rentals = rentals;
+		this.rentals = rentalsParse(rentals);
 		this.price = price;
 		this.tax = tax;
 		this.code = codeParse(title);
@@ -49,29 +47,24 @@ public class Movie {
 		return code;
 	}
 	
-	public void rentalRegister(int userId) {
-		rentals = Arrays.copyOf(rentals,rentals.length + 1);
-		rentals[rentals.length - 1] = new int[]{userId, 7};
-		quantity--;
-	}
-	
-	public void rentalUnregister(int userId) {
-		for(int i = findUserIndex(userId); i < rentals.length - 1; i++) {
-			rentals[i][0] = rentals[i + 1][0];
-			rentals[i][1] = rentals[i + 1][1];
+	//TODO
+	private int[][] rentalsParse(String rentals) {
+		rentals.replace("()", ""); // remove os parenteses da string
+		int counter = 1; // numero de 
+		
+		for(int i = 0; i < rentals.length(); i++) {
+			counter++;
 		}
 		
-		rentals = Arrays.copyOf(rentals, rentals.length - 1);
-		quantity++;
-	}
-	
-	public int findUserIndex(int userId) {
-		for(int i = 0; i < rentals.length; i++) { // procura o usuario
-			if(rentals[i][0] == userId) {
-				return i; // retorna o index do usuario
-			}
-		}
-		return -1;
+		String[] lines = new String[counter];
+		
+		int[][] rentalsAr = new int[counter][2];
+		
+//		for(int j = 0; j < counter; j++) {
+//			rentalsAr[j] = Integer.parseInt(lines[j].split(";"));
+//		}
+		
+		return rentalsAr;
 	}
 	
 	private String codeParse(String title) {
@@ -104,10 +97,10 @@ public class Movie {
 	}
 	
 	private void delNonLetters(StringBuilder sb) {
-		for(int i = 0; i < sb.length(); i++) { // apaga todos os caracteres que nao sao letras
+		for(int i = 0; i < sb.length(); i++) {
 			if(!Character.isLetter(sb.charAt(i))) {
 				sb.deleteCharAt(i);
-				i--; // decrementar o index para nao saltar caracteres
+				i--;
 			}
 		}
 	}
