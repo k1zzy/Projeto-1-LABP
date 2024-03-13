@@ -7,7 +7,7 @@ Rental successful: client 34 rented Inglorious Basterds for $3.99
 Total: $3.99 [$3.91]
 Rental successful: client 12 rented E.T. the Extra-Terrestrial for $0.99
 Total: $0.99 [$0.97]
-Movie was not rented before by user: client 4 asked for Angels & Demons
+Movie not rented before by user: client 4 asked for Angels & Demons
 Movie not found: client 16 asked for Johnny English
 
 

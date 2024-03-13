@@ -183,9 +183,6 @@ public class VideoClub {
 						
 						totalRevenue += currentFilme.getPrice(); // adiciona ao total de revenue o preço do filme
 						totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
-						
-						// revenue += currentFilme.getPrice(); // adiciona ao total de revenue o preço do filme
-						// profit += afterTax; // adiciona ao profit o total apos as taxas de estudio
 					}
 				}
 			}else {
