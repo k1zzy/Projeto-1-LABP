@@ -1,17 +1,17 @@
 >> Log from rentals3
-Rental sucessful: client 11 rented Angels & Demons for $7.99
-Total: $7.99[$7.96]
-Movie returned: client 25 returned Jurassic Park
-Rental sucessful: client 34 rented Inglorious Basterds for $3.99
-Total: $3.99[$3.97]
-Rental sucessful: client 12 rented E.T. the Extra-Terrestrial for $0.99
-Total: $0.99[$0.97]
-Movie returned: client 4 returned Mad Max: Fury Road
-Rental sucessful: client 16 rented Johnny English for $3.99
-Total: $3.99[$3.87]
-Revenue: $16.96
-Profit: $16.77
+Rental successful: client 11 rented Angels & Demons for $7.99
+Total: $7.99 [$7.75]
+Movie returned with 1 day of delay: client 25 returned Jurassic Park
+Total: $2.00 [$1.92]
+Rental successful: client 34 rented Inglorious Basterds for $3.99
+Total: $3.99 [$3.91]
+Rental successful: client 12 rented E.T. the Extra-Terrestrial for $0.99
+Total: $0.99 [$0.97]
+Movie returned with 1 day of delay: client 4 returned Mad Max: Fury Road
+Total: $2.00 [$1.91]
+Rental successful: client 16 rented Johnny English for $3.99
+Total: $3.99 [$3.51]
 
 
-Revenue: $16.96
-Profit: $16.77
+Revenue: $20.96
+Profit: $19.97

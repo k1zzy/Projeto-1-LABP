@@ -1,3 +1,10 @@
+/**
+ * Classe que representa um VideoClub.
+ * 
+ * @author Rodrigo Afonso (61839)
+ * @version 1.0
+ */
+
 package project;
 
 import java.io.FileNotFoundException;
@@ -12,6 +19,14 @@ public class VideoClub {
 	private double totalRevenue;
 	private Movie[] filmes;
 	
+	/**
+	 * Representa um VideoClub.
+	 * Contém características de um VideoClub.
+	 * 
+	 * @param fileName - nome do ficheiro do stock
+	 * @param numberOfMovies - número de filmes a retirar do stock
+	 * @throws FileNotFoundException - exceção para ficheiro não encontrado
+	 */
 	public VideoClub(String fileName, int numberOfMovies)throws
 	FileNotFoundException {
 		String[][] stock = readStock(fileName, numberOfMovies);
@@ -29,10 +44,20 @@ public class VideoClub {
 		}
 	}
 	
+	/**
+	 * Retorna o número de filmes.
+	 *
+	 * @return o número de filmes
+	 */
 	public int getNumberOfMovies() {
 		return filmes.length;
 	}
 	
+	/**
+	 * Retorna o número de filmes disponíveis.
+	 *
+	 * @return o número de filmes disponíveis
+	 */
 	public int numberAvailableMovies() {
 		int filmesAvailable = 0;
 		
@@ -43,14 +68,30 @@ public class VideoClub {
 		return filmesAvailable;
 	}
 	
+	/**
+	 * Retorna o valor total da receita.
+	 *
+	 * @return o valor total da receita
+	 */
 	public double getTotalRevenue() {
 		return totalRevenue;
 	}
 	
+	/**
+	 * Retorna o valor total do profit.
+	 *
+	 * @return o valor total do profit
+	 */
 	public double getTotalProfit() {
 		return totalProfit;
 	}
 	
+	/**
+	 * Retorna uma lista de filmes com o ano igual ao ano dado.
+	 *
+	 * @param year - ano a filtrar
+	 * @return uma String de filmes com o ano igual ao ano dado
+	 */
 	public String filterByYear(int year) {
 		StringBuilder yearFilter = new StringBuilder();
 		
@@ -62,6 +103,12 @@ public class VideoClub {
 		return yearFilter.toString(); // retorna a lista de filmes com o ano igual ao ano dado
 	}
 	
+	/**
+	 * Retorna uma lista de filmes com o preço menor ou igual ao preço dado.
+	 *
+	 * @param price - preço a filtrar
+	 * @return uma String de filmes com o preço menor ou igual ao preço dado
+	 */
 	public String filterByPrice(double price) {
 		StringBuilder priceFilter = new StringBuilder();
 		
@@ -73,6 +120,11 @@ public class VideoClub {
 		return priceFilter.toString(); // retorna a lista de filmes com o preço menor ou igual ao preço dado
 	}
 	
+	/**
+	 * Retorna uma lista de filmes que contenham em stock uma ou mais cópias.
+	 *
+	 * @return uma String de filmes disponíveis para alugar
+	 */
 	public String filterAvailableMovies() {
 		StringBuilder availableMovies = new StringBuilder();
 		
@@ -84,6 +136,13 @@ public class VideoClub {
 		return availableMovies.toString(); // retorna a lista de filmes disponiveis
 	}
 	
+	/**
+	 * Um log da atividade durante um dia do VideoClub.
+	 *
+	 * @param rentalsFileName - nome do ficheiro de rentals feitos durante o dia
+	 * @throws FileNotFoundException - exceção para ficheiro não encontrado
+	 * @return uma String de todas as ações feitas durante o dia
+	 */
 	public String activityLog(String rentalsFileName) throws
 	FileNotFoundException{
 		String[][] rentalsRead = readRentalsFile(rentalsFileName);
@@ -174,6 +233,12 @@ public class VideoClub {
 		return sbRentals.toString();
 	}
 	
+	/**
+	 * Atualiza o stock do VideoClub após todas as ações feitas durante o dia.
+	 *
+	 * @throws FileNotFoundException - exceção para ficheiro não encontrado
+	 * @param fileName - nome do ficheiro onde escrever o novo stock
+	 */
 	public void updateStock(String fileName) throws
 	FileNotFoundException { 
 		StringBuilder newStock = new StringBuilder("Title,Year,Quantity,Rentals,Price,Tax"); // cabecalho do ficheiro
@@ -194,6 +259,12 @@ public class VideoClub {
 		escrever.close();
 	}
 	
+	/**
+	 * Função auxiliar para converter um array de rentals para uma string 2D.
+	 * 
+	 * @param rentals - array de rentals a converter
+	 * @return uma string 2D dos rentals do filme
+	 */
 	private String rentalsArrayToString(int[][] rentals) {
 		StringBuilder rentalsString = new StringBuilder();
 
@@ -208,6 +279,14 @@ public class VideoClub {
 		return rentalsString.toString();
 	}
 	
+	/**
+	 * Função auxiliar para ler o stock do VideoClub.
+	 * 
+	 * @param fileName - nome do ficheiro do stock
+	 * @param numberOfMovies - número de filmes a retirar do stock
+	 * @throws FileNotFoundException - exceção para ficheiro não encontrado
+	 * @return uma array com todos os parametros de cada filme em stock em cada linha
+	 */
 	private String[][] readStock(String fileName, int numberOfMovies)throws
 	FileNotFoundException {
 		Scanner ler = new Scanner(new File(fileName));
@@ -228,34 +307,37 @@ public class VideoClub {
 		return stock;
 	}
 	
-	//TODO tirar o segundo scanner
+	/**
+	 * Função auxiliar para ler o ficheiro de rentals.
+	 * 
+	 * @param rentalsFileName - nome do ficheiro de rentals feitos durante o dia
+	 * @throws FileNotFoundException - exceção para ficheiro não encontrado
+	 * @return uma array com todos os rentals feitos durante o dia
+	 */
 	private String[][] readRentalsFile(String rentalsFileName)throws
 	FileNotFoundException {
 		Scanner ler = new Scanner(new File(rentalsFileName));
-		ler.nextLine(); // skippar cabealho
+		ler.nextLine(); // skippar cabeçalho
 		int nLinhas = 0;
 		
+		String[][] rentals = new String[1][3];
+
 		while(ler.hasNext()) {
-			nLinhas++; // contar linhas
-			ler.nextLine(); 
+			rentals = Arrays.copyOf(rentals, nLinhas + 1);
+			rentals[nLinhas] = ler.nextLine().split(",");
+			nLinhas++;
 		}
 		
 		ler.close();
-		
-		Scanner ler2 = new Scanner(new File(rentalsFileName));
-		ler2.nextLine(); // skippar cabecalho
-		
-		String[][] rentals = new String[nLinhas][3];
-		
-		for(int i = 0; i < nLinhas; i++) {
-			rentals[i] = ler2.nextLine().split(",");
-		}
-		
-		ler2.close();
-		
 		return rentals;
 	}
 	
+	/**
+	 * Função auxiliar para converter a String representativa de rentals do filme numa array de inteiros.
+	 * 
+	 * @param rentals - string representativa de rentals do filme
+	 * @return uma array de inteiros representativa de rentals do filme
+	 */
 	private int[][] rentalsParse(String rentals) {
 		if (rentals.equals("")) { // se a string estiver vazia
 			return new int[0][0]; // retorna um array vazio
@@ -279,6 +361,12 @@ public class VideoClub {
 		return rentalsAr;
 	}
 	
+	/**
+	 * Verifica se um filme existe no VideoClub.
+	 * 
+	 * @param name - nome do filme a procurar
+	 * @return true se o filme existir, false se o filme nao existir
+	 */
 	private boolean doesMovieExist(String name) {
 		for(Movie filme : filmes) { // procura o filme pelo nome ou pelo codigo
 			if(filme.getTitle().equals(name) || filme.getCode().equals(name)) {
@@ -288,10 +376,22 @@ public class VideoClub {
 		return false;  // retorna false se o filme nao existir
 	}
 	
+	/**
+	 * Verifica se existe pelo menos uma cópia de dado filme.
+	 * 
+	 * @param movie - filme a verificar
+	 * @return true se o filme estiver disponível, false se o filme nao estiver disponível
+	 */
 	private boolean isMovieAvailable(Movie movie) {
 		return movie.getQuantity() >= 1; // retorna true se a quantidade do filme for maior ou igual a 1
 	}
 	
+	/**
+	 * Procura um filme pelo nome ou pelo código.
+	 * 
+	 * @param name - nome ou código do filme a procurar
+	 * @return o filme encontrado
+	 */
 	private Movie findMovie(String name) {
 		for(Movie filme : filmes) { // procura o filme pelo nome ou pelo codigo
 			if (filme.getTitle().equals(name) || filme.getCode().equals(name))
