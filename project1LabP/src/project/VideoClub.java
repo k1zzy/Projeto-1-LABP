@@ -1,6 +1,7 @@
 package project;
 
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
@@ -85,7 +86,7 @@ public class VideoClub {
 	
 	public String activityLog(String rentalsFileName) throws
 	FileNotFoundException{
-		String[][] rentalsRead = readRentals(rentalsFileName);
+		String[][] rentalsRead = readRentalsFile(rentalsFileName);
 		StringBuilder sbRentals = new StringBuilder();
 		double afterTax = 0;
 		String userId = "";
@@ -154,7 +155,7 @@ public class VideoClub {
 					numOfLateDays = Math.abs(numOfLateDays);
 					afterTax = numOfLateDays * 2.0 * (1 - currentFilme.getTax() / 100); // numero de dias * 2 (taxa por dia atrasado) menos a taxa de estudio
 					
-					String s = numOfLateDays == 1 ? "" : "s";
+					String s = numOfLateDays == 1 ? "" : "s"; // se o numero de dias for 1, nao adiciona o "s"
 					
 					sbRentals.append("Movie returned with " + numOfLateDays + " day" + s + " of delay: client " + userId);
 					sbRentals.append(" returned " + currentFilme.getTitle());
@@ -166,21 +167,45 @@ public class VideoClub {
 					
 					totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
 					totalRevenue += numOfLateDays * 2.0; // numero de dias * 2 (taxa por dia atrasado)
-					
-					// revenue += numOfLateDays * 2.0;; 
-					// profit += numOfLateDays * 2.0; 	// numero de dias * 2 (taxa por dia atrasado)
 				}
 			}
 		}
-		//sbRentals.append(String.format(Locale.US,"Revenue: $%.2f" + System.lineSeparator(), revenue)); //pelos vistos nao e preciso
-		//sbRentals.append(String.format(Locale.US,"Profit: $%.2f" + System.lineSeparator(), profit));
 		
 		return sbRentals.toString();
 	}
 	
 	public void updateStock(String fileName) throws
-	FileNotFoundException {
+	FileNotFoundException { 
+		StringBuilder newStock = new StringBuilder("Title,Year,Quantity,Rentals,Price,Tax"); // cabecalho do ficheiro
+		newStock.append(System.lineSeparator());
 		
+		PrintWriter escrever = new PrintWriter((fileName)); // cria um novo ficheiro
+		for (Movie filme : filmes) { // escreve o novo stock no ficheiro
+		    newStock.append(filme.getTitle() + ",");
+		    newStock.append(filme.getYear() + ",");
+		    newStock.append(filme.getQuantity() + ",");
+		    newStock.append(rentalsArrayToString(filme.getRentals()) + ",");
+		    newStock.append(filme.getPrice() + ",");
+		    newStock.append(filme.getTax() + "%");
+			newStock.append(System.lineSeparator());
+		}
+		
+		escrever.write(newStock.toString());
+		escrever.close();
+	}
+	
+	private String rentalsArrayToString(int[][] rentals) {
+		StringBuilder rentalsString = new StringBuilder();
+
+		for (int i = 0; i < rentals.length; i++) {
+			if(i != rentals.length - 1)
+				rentalsString.append("(" + rentals[i][0] + ";" + rentals[i][1] + ") ");
+			else
+				rentalsString.append("(" + rentals[i][0] + ";" + rentals[i][1] + ")");
+				
+		}
+
+		return rentalsString.toString();
 	}
 	
 	private String[][] readStock(String fileName, int numberOfMovies)throws
@@ -203,7 +228,8 @@ public class VideoClub {
 		return stock;
 	}
 	
-	private String[][] readRentals(String rentalsFileName)throws
+	//TODO tirar o segundo scanner
+	private String[][] readRentalsFile(String rentalsFileName)throws
 	FileNotFoundException {
 		Scanner ler = new Scanner(new File(rentalsFileName));
 		ler.nextLine(); // skippar cabealho
@@ -217,7 +243,7 @@ public class VideoClub {
 		ler.close();
 		
 		Scanner ler2 = new Scanner(new File(rentalsFileName));
-		ler2.nextLine(); // skippar cabealho
+		ler2.nextLine(); // skippar cabecalho
 		
 		String[][] rentals = new String[nLinhas][3];
 		
@@ -242,7 +268,6 @@ public class VideoClub {
 		
 		String[][] rentalsArString = new String[lines.length][2]; // cria um array de strings com o tamanho do numero de linhas
 		int[][] rentalsAr = new int[lines.length][2]; // cria um array de inteiros com o tamanho do numero de linhas
-		
 		
 		for(int i = 0; i < rentalsAr.length; i++) { // separa a string por ponto e virgula
 			rentalsArString[i] = lines[i].split(";"); 
