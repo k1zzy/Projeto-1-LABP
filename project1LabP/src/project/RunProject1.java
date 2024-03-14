@@ -13,31 +13,31 @@ public class RunProject1 {
 	private void execute() throws FileNotFoundException {
 
 		int exec = 1;
-		// pedido 1
-		try (PrintWriter writer = new PrintWriter(String.format("./log/log%d.txt", exec))) {
-			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", exec), 2);
-			String purchaseLog = blockbuster.activityLog("./csv/rentals/rentals1.csv");
-			writeLog(writer, purchaseLog, exec);
-			updateLogAndStock(exec, writer, blockbuster);
-		};
+//		// pedido 1
+//		try (PrintWriter writer = new PrintWriter(String.format("./log/log%d.txt", exec))) {
+//			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", exec), 2);
+//			String purchaseLog = blockbuster.activityLog("./csv/rentals/rentals1.csv");
+//			writeLog(writer, purchaseLog, exec);
+//			updateLogAndStock(exec, writer, blockbuster);
+//		};
 
 		exec++;
 		// pedido 2
 		try (PrintWriter writer = new PrintWriter(String.format("./log/log%d.txt", 4))) {
-			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", 2), 6);
+			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", 2), 7);
 			String purchaseLog = blockbuster.activityLog("./csv/rentals/rentals" + 3 + ".csv");
 			writeLog(writer, purchaseLog, exec);
 			updateLogAndStock(exec, writer, blockbuster);
 		};
 
-		exec++;
-		// pedido 3
-		try (PrintWriter writer = new PrintWriter(String.format("./log/log%d.txt", exec))) {
-			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", exec), 20);
-			String purchaseLog = blockbuster.activityLog("./csv/rentals/rentals" + exec + ".csv");
-			writeLog(writer, purchaseLog, exec);
-			updateLogAndStock(exec, writer, blockbuster);
-		};
+//		exec++;
+//		// pedido 3
+//		try (PrintWriter writer = new PrintWriter(String.format("./log/log%d.txt", exec))) {
+//			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", exec), 20);
+//			String purchaseLog = blockbuster.activityLog("./csv/rentals/rentals" + exec + ".csv");
+//			writeLog(writer, purchaseLog, exec);
+//			updateLogAndStock(exec, writer, blockbuster);
+//		};
 
 	}
 

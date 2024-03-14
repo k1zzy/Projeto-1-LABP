@@ -31,16 +31,35 @@ public class VideoClub {
 	FileNotFoundException {
 		String[][] stock = readStock(fileName, numberOfMovies);
 		filmes = new Movie[stock.length];
+		int line = 2;
 		
-		for(int i = 0; i < stock.length; i++) {
-			filmes[i] = new Movie(
-									stock[i][0], // title
-									Integer.parseInt(stock[i][1]), // year
-									Integer.parseInt(stock[i][2]), // quantity
-									rentalsParse(stock[i][3]), // rentals
-									Double.parseDouble(stock[i][4]), // price
-									Double.parseDouble(stock[i][5].replace("%", "")) // tax, deletes %
-								 );
+		try {
+			for(int i = 0; i < stock.length; i++) {
+				line++;
+				filmes[i] = new Movie(
+										stock[i][0], // title
+										Integer.parseInt(stock[i][1]), // year
+										Integer.parseInt(stock[i][2]), // quantity
+										rentalsParse(stock[i][3]), // rentals
+										Double.parseDouble(stock[i][4]), // price
+										Double.parseDouble(stock[i][5].replace("%", "")) // tax, deletes %
+									 );
+		}
+		} catch(ArrayIndexOutOfBoundsException e) {
+			int exceptionIndex = e.getMessage().charAt(6) - '0';
+			
+			switch(exceptionIndex) {
+			case 0:
+				throw new ArrayIndexOutOfBoundsException("Filme sem nome definido no stock: linha " + line + " do ficheiro " + fileName);
+			case 1:
+				throw new ArrayIndexOutOfBoundsException("Filme sem ano definido no stock: linha " + line + " do ficheiro " + fileName);
+			case 2:
+				throw new ArrayIndexOutOfBoundsException("Filme sem quantidade definida no stock: linha " + line + " do ficheiro " + fileName);
+			case 4:
+				throw new ArrayIndexOutOfBoundsException("Filme sem preço definido no stock: linha " + line + " do ficheiro " + fileName);
+			case 5:
+				throw new ArrayIndexOutOfBoundsException("Filme sem taxa de estúdio definida no stock: linha " + line + " do ficheiro " + fileName);
+			}
 		}
 	}
 	
@@ -186,6 +205,8 @@ public class VideoClub {
 					}
 				}
 			}else {
+				// SE DEVOLVER UM FILME QUE NAO EXISITR
+				
 				Movie currentFilme = findMovie(title);
 				
 				int numOfLateDays = 0;
@@ -291,6 +312,7 @@ public class VideoClub {
 		int nLinhas = 0;
 		
 		String[][] stock = new String[numberOfMovies][6]; // cria um array de strings com o tamanho do numero de filmes	
+		
 		for(int i = 0; i < numberOfMovies && ler.hasNext(); i++) {
 			stock[i] = ler.nextLine().split(","); // separa a string por virgula
 			nLinhas++;
