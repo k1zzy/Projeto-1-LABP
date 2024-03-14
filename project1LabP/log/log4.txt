@@ -1,0 +1,15 @@
+>> Log from rentals2
+Rental successful: client 11 rented Angels & Demons for $7.99
+Total: $7.99 [$7.75]
+Movie returned with 1 day of delay: client 25 returned Jurassic Park
+Total: $2.00 [$1.92]
+Rental successful: client 34 rented Inglorious Basterds for $3.99
+Total: $3.99 [$3.91]
+Rental successful: client 12 rented E.T. the Extra-Terrestrial for $0.99
+Total: $0.99 [$0.97]
+Movie not in videoclub: client 4 tried to return MARDFR
+Movie not found: client 16 asked for Johnny English
+
+
+Revenue: $14.97
+Profit: $14.55

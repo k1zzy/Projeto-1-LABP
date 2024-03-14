@@ -24,13 +24,13 @@ public class RunProject1 {
 		exec++;
 		// pedido 2
 		try (PrintWriter writer = new PrintWriter(String.format("./log/log%d.txt", 4))) {
-			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", 2), 7);
+			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", 2), 6);
 			String purchaseLog = blockbuster.activityLog("./csv/rentals/rentals" + 3 + ".csv");
 			writeLog(writer, purchaseLog, exec);
 			updateLogAndStock(exec, writer, blockbuster);
 		};
 
-//		exec++;
+		exec++;
 //		// pedido 3
 //		try (PrintWriter writer = new PrintWriter(String.format("./log/log%d.txt", exec))) {
 //			VideoClub blockbuster = new VideoClub(String.format("./csv/stockIn/stockIn%d.csv", exec), 20);

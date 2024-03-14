@@ -137,6 +137,15 @@ public class Movie {
 	}
 	
 	/**
+	 * Método utilizado para atualizar o tempo de aluguer de um filme.
+	 */
+	public void updateRentalsTime() {
+		for (int[] rental : rentals) {
+			rental[1]--;
+		}
+	}
+	
+	/**
 	 * Método utilizado encontrar o index no array de rentals de um user.
 	 * 
 	 * @param userId - id do usuário a procurar

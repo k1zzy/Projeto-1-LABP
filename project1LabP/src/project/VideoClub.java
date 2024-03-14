@@ -181,7 +181,7 @@ public class VideoClub {
 						sbRentals.append(System.lineSeparator());
 						
 					}else { // se o filme existir
-						Movie currentFilme = findMovie(title); 
+						Movie currentFilme = findMovie(title);
 						
 						if(!isMovieAvailable(currentFilme)) { // se o filme nao estiver disponivel mas existir
 							sbRentals.append("Movie currently not available: client " + userId);
@@ -203,7 +203,7 @@ public class VideoClub {
 							}catch (NumberFormatException e) {
 								throw new NumberFormatException("Erro, formato de user inválido: linha " + line + " do ficheiro " + rentalsFileName);
 							}
-								
+							
 							totalRevenue += currentFilme.getPrice(); // adiciona ao total de revenue o preço do filme
 							totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
 						}
@@ -281,6 +281,8 @@ public class VideoClub {
 		
 		PrintWriter escrever = new PrintWriter((fileName)); // cria um novo ficheiro
 		for (Movie filme : filmes) { // escreve o novo stock no ficheiro
+			filme.updateRentalsTime(); // atualiza o tempo de aluguer
+			
 		    newStock.append(filme.getTitle() + ",");
 		    newStock.append(filme.getYear() + ",");
 		    newStock.append(filme.getQuantity() + ",");
