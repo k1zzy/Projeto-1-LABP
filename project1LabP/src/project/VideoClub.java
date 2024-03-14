@@ -26,12 +26,14 @@ public class VideoClub {
 	 * @param fileName - nome do ficheiro do stock
 	 * @param numberOfMovies - número de filmes a retirar do stock
 	 * @throws FileNotFoundException - exceção para ficheiro não encontrado
+	 * @throws NumberFormatException - exceção para erros na conversão de tipos
+	 * @throws ArrayIndexOutOfBoundsException - exceção para argumentos insuficientes
 	 */
 	public VideoClub(String fileName, int numberOfMovies)throws
 	FileNotFoundException {
 		String[][] stock = readStock(fileName, numberOfMovies);
 		filmes = new Movie[stock.length];
-		int line = 2;
+		int line = 1;
 		
 		try {
 			for(int i = 0; i < stock.length; i++) {
@@ -45,24 +47,12 @@ public class VideoClub {
 										Double.parseDouble(stock[i][5].replace("%", "")) // tax, deletes %
 									 );
 		}
-		} catch(ArrayIndexOutOfBoundsException e) {
-			int exceptionIndex = e.getMessage().charAt(6) - '0';
-			
-			switch(exceptionIndex) {
-			case 0:
-				throw new ArrayIndexOutOfBoundsException("Filme sem nome definido no stock: linha " + line + " do ficheiro " + fileName);
-			case 1:
-				throw new ArrayIndexOutOfBoundsException("Filme sem ano definido no stock: linha " + line + " do ficheiro " + fileName);
-			case 2:
-				throw new ArrayIndexOutOfBoundsException("Filme sem quantidade definida no stock: linha " + line + " do ficheiro " + fileName);
-			case 4:
-				throw new ArrayIndexOutOfBoundsException("Filme sem preço definido no stock: linha " + line + " do ficheiro " + fileName);
-			case 5:
-				throw new ArrayIndexOutOfBoundsException("Filme sem taxa de estúdio definida no stock: linha " + line + " do ficheiro " + fileName);
-			}
+		}catch(ArrayIndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException("Erro na leitura, argumentos insuficientes: linha " + line + " do ficheiro " + fileName);
+		}catch(NumberFormatException e) {
+			throw new NumberFormatException("Erro na conversão de tipos: linha " + line + " do ficheiro " + fileName);
 		}
 	}
-	
 	/**
 	 * Retorna o número de filmes.
 	 *
@@ -160,6 +150,8 @@ public class VideoClub {
 	 *
 	 * @param rentalsFileName - nome do ficheiro de rentals feitos durante o dia
 	 * @throws FileNotFoundException - exceção para ficheiro não encontrado
+	 * @throws NumberFormatException - exceção para formato de user inválido
+	 * @throws ArrayIndexOutOfBoundsException - exceção para argumentos insuficientes
 	 * @return uma String de todas as ações feitas durante o dia
 	 */
 	public String activityLog(String rentalsFileName) throws
@@ -169,82 +161,107 @@ public class VideoClub {
 		double afterTax = 0;
 		String userId = "";
 		String title = "";
+		int line = 1;
 		
 		for(String[] action : rentalsRead) {
-			userId = action[1];
-			title = action[2];
+			line++;
 			
-			if(action[0].equals("rent")) { // se o user esta a alugar um filme
-				if(!doesMovieExist(title)) { // se o filme nao existir
-					sbRentals.append("Movie not found: client " + userId); 
-					sbRentals.append(" asked for " + title);
-					sbRentals.append(System.lineSeparator());
-					
-				}else { // se o filme existir
-					Movie currentFilme = findMovie(title); 
-					
-					if(!isMovieAvailable(currentFilme)) { // se o filme nao estiver disponivel mas existir
-						sbRentals.append("Movie currently not available: client " + userId);
-						sbRentals.append(" asked for " + currentFilme.getTitle());
+			try {
+				userId = action[1];
+				title = action[2];
+			}catch(ArrayIndexOutOfBoundsException e) {
+				throw new ArrayIndexOutOfBoundsException("Erro na leitura, argumentos insuficientes: linha " + line + " do ficheiro " + rentalsFileName);
+			}
+			
+			try {
+				if(action[0].equals("rent")) { // se o user esta a alugar um filme
+					if(!doesMovieExist(title)) { // se o filme nao existir
+						sbRentals.append("Movie not found: client " + userId); 
+						sbRentals.append(" asked for " + title);
 						sbRentals.append(System.lineSeparator());
 						
-					}else { // se o filme estiver disponivel e existir
-						afterTax = currentFilme.getPrice() * (1 - currentFilme.getTax() / 100); // calcula o preço apos as taxas de estudio
+					}else { // se o filme existir
+						Movie currentFilme = findMovie(title); 
 						
-						sbRentals.append("Rental successful: client " + userId); 
-						sbRentals.append(" rented " + currentFilme.getTitle()); 
-						sbRentals.append(String.format(Locale.US," for $%.2f", currentFilme.getPrice()));
-						sbRentals.append(System.lineSeparator());
-						sbRentals.append(String.format(Locale.US,"Total: $%.2f [$%.2f]", currentFilme.getPrice(), afterTax));
-						sbRentals.append(System.lineSeparator());
-						
-						currentFilme.rentalRegister(Integer.parseInt(userId)); // regista um novo rental
-						
-						totalRevenue += currentFilme.getPrice(); // adiciona ao total de revenue o preço do filme
-						totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
+						if(!isMovieAvailable(currentFilme)) { // se o filme nao estiver disponivel mas existir
+							sbRentals.append("Movie currently not available: client " + userId);
+							sbRentals.append(" asked for " + currentFilme.getTitle());
+							sbRentals.append(System.lineSeparator());
+							
+						}else { // se o filme estiver disponivel e existir
+							afterTax = currentFilme.getPrice() * (1 - currentFilme.getTax() / 100); // calcula o preço apos as taxas de estudio
+							
+							sbRentals.append("Rental successful: client " + userId); 
+							sbRentals.append(" rented " + currentFilme.getTitle()); 
+							sbRentals.append(String.format(Locale.US," for $%.2f", currentFilme.getPrice()));
+							sbRentals.append(System.lineSeparator());
+							sbRentals.append(String.format(Locale.US,"Total: $%.2f [$%.2f]", currentFilme.getPrice(), afterTax));
+							sbRentals.append(System.lineSeparator());
+							
+							try {
+								currentFilme.rentalRegister(Integer.parseInt(userId)); // regista um novo rental
+							}catch (NumberFormatException e) {
+								throw new NumberFormatException("Erro, formato de user inválido: linha " + line + " do ficheiro " + rentalsFileName);
+							}
+								
+							totalRevenue += currentFilme.getPrice(); // adiciona ao total de revenue o preço do filme
+							totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
+						}
 					}
+				}else if(action[0].equals("return")) { // se o user esta a devolver um filme
+					int numOfLateDays = 0;
+					
+					if (!doesMovieExist(title)) { // se o filme nao existir
+						sbRentals.append("Movie not in videoclub: client " + userId);
+						sbRentals.append(" tried to return " + title);
+						sbRentals.append(System.lineSeparator());
+						
+					}else { // se o filme existir
+						Movie currentFilme = findMovie(title);
+	
+						try {
+							numOfLateDays = currentFilme.getRentals()[currentFilme.findUserIndex(Integer.parseInt(userId))][1]; // numero de dias em atraso
+						}catch (Exception e) {
+							sbRentals.append("Movie not rented before by user: client " + userId);
+							sbRentals.append(" asked for " + currentFilme.getTitle());
+							sbRentals.append(System.lineSeparator());
+							continue;
+						}
+						if(numOfLateDays >= 0) { // se nao houver atraso na devolucao
+							sbRentals.append("Movie returned: client " + userId);
+							sbRentals.append(" returned " + currentFilme.getTitle());
+							sbRentals.append(System.lineSeparator());
+							sbRentals.append("Total: $0.00 [$0.00]");
+							sbRentals.append(System.lineSeparator());
+							
+							currentFilme.rentalUnregister(Integer.parseInt(userId));
+							
+						}else { // se houver atraso na devolucao
+							numOfLateDays = Math.abs(numOfLateDays);
+							afterTax = numOfLateDays * 2.0 * (1 - currentFilme.getTax() / 100); // numero de dias * 2 (taxa por dia atrasado) menos a taxa de estudio
+							
+							String s = numOfLateDays == 1 ? "" : "s"; // se o numero de dias for 1, nao adiciona o "s"
+							
+							sbRentals.append("Movie returned with " + numOfLateDays + " day" + s + " of delay: client " + userId);
+							sbRentals.append(" returned " + currentFilme.getTitle());
+							sbRentals.append(System.lineSeparator());
+							sbRentals.append(String.format(Locale.US,"Total: $%.2f [$%.2f]", numOfLateDays * 2.0, afterTax));
+							sbRentals.append(System.lineSeparator());
+							
+							currentFilme.rentalUnregister(Integer.parseInt(userId));
+							
+							totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
+							totalRevenue += numOfLateDays * 2.0; // numero de dias * 2 (taxa por dia atrasado)
+						}
+					}
+				}else { // se a açao nao for rent ou return
+					sbRentals.append("Invalid action: client " + userId);
+					sbRentals.append(" tried to " + action[0]);
+					sbRentals.append(System.lineSeparator());
 				}
-			}else {
-				// SE DEVOLVER UM FILME QUE NAO EXISITR
-				
-				Movie currentFilme = findMovie(title);
-				
-				int numOfLateDays = 0;
-				
-				try {
-					numOfLateDays = currentFilme.getRentals()[currentFilme.findUserIndex(Integer.parseInt(userId))][1]; // numero de dias em atraso
-				} catch (Exception e) {
-					sbRentals.append("Movie not rented before by user: client " + userId);
-					sbRentals.append(" asked for " + currentFilme.getTitle());
-					sbRentals.append(System.lineSeparator());
-					continue;
-				}
-				if(numOfLateDays >= 0) { // se nao houver atraso na devolucao
-					sbRentals.append("Movie returned: client " + userId);
-					sbRentals.append(" returned " + currentFilme.getTitle());
-					sbRentals.append(System.lineSeparator());
-					sbRentals.append("Total: $0.00 [$0.00]");
-					sbRentals.append(System.lineSeparator());
-					
-					currentFilme.rentalUnregister(Integer.parseInt(userId));
-					
-				}else { // se houver atraso na devolucao
-					numOfLateDays = Math.abs(numOfLateDays);
-					afterTax = numOfLateDays * 2.0 * (1 - currentFilme.getTax() / 100); // numero de dias * 2 (taxa por dia atrasado) menos a taxa de estudio
-					
-					String s = numOfLateDays == 1 ? "" : "s"; // se o numero de dias for 1, nao adiciona o "s"
-					
-					sbRentals.append("Movie returned with " + numOfLateDays + " day" + s + " of delay: client " + userId);
-					sbRentals.append(" returned " + currentFilme.getTitle());
-					sbRentals.append(System.lineSeparator());
-					sbRentals.append(String.format(Locale.US,"Total: $%.2f [$%.2f]", numOfLateDays * 2.0, afterTax));
-					sbRentals.append(System.lineSeparator());
-					
-					currentFilme.rentalUnregister(Integer.parseInt(userId));
-					
-					totalProfit += afterTax; // adiciona ao profit o total apos as taxas de estudio
-					totalRevenue += numOfLateDays * 2.0; // numero de dias * 2 (taxa por dia atrasado)
-				}
+			}catch (NullPointerException e) {
+				sbRentals.append("No rentals made today");
+				sbRentals.append(System.lineSeparator());
 			}
 		}
 		
@@ -290,10 +307,8 @@ public class VideoClub {
 			if(i != rentals.length - 1)
 				rentalsString.append("(" + rentals[i][0] + ";" + rentals[i][1] + ") ");
 			else
-				rentalsString.append("(" + rentals[i][0] + ";" + rentals[i][1] + ")");
-				
+				rentalsString.append("(" + rentals[i][0] + ";" + rentals[i][1] + ")");		
 		}
-
 		return rentalsString.toString();
 	}
 	

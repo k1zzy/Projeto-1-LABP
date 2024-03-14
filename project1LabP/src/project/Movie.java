@@ -181,8 +181,11 @@ public class Movie {
 			index += 4;
 		}
 		
-		code.delete(3, (code.length() - 3)); //  mantem apenas os 3 primeiros caracteres e os ultimos 3
-		
+		try {
+			code.delete(3, (code.length() - 3)); //  mantem apenas os 3 primeiros caracteres e os ultimos 3
+		} catch (StringIndexOutOfBoundsException e) {
+			throw new StringIndexOutOfBoundsException("Titulo: '" + title +"' é muito pequeno ou nulo"); // se o titulo for muito pequeno ou null
+		}	
 		return code.toString();
 	}
 	
