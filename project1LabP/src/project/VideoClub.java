@@ -393,7 +393,6 @@ public class VideoClub {
 				rentalsAr[i][j] = Integer.parseInt(rentalsArString[i][j]);
 			}
 		}
-		
 		return rentalsAr;
 	}
 	
